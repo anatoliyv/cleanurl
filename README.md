@@ -313,37 +313,20 @@ If you encounter any issues or have questions, please:
 ## Changelog
 
 ### v1.0.4 (Latest)
-- **Fixed trailing slash removal**: Now consistently removes trailing slashes from all URLs
-- **Improved HTTP/HTTPS deduplication**: Better logic for handling processed URLs
-- **Enhanced deduplication**: Fixed bug where trailing slashes weren't being removed properly
-- **All tests passing**: Comprehensive test coverage maintained
+- Fixed trailing slash removal logic
+- Improved HTTP/HTTPS deduplication
 
 ### v1.0.3
-- **Lowercase conversion**: Added automatic conversion of all URLs to lowercase for consistent processing
-- **Enhanced pipeline**: Lowercase conversion is now the first step in the cleaning pipeline
-- **Improved deduplication**: Better deduplication through case-insensitive URL processing
-- **New flags**: Added `--lower` and `--no-lower` options
-- **Updated examples**: Example files now include mixed-case URLs
+- Added lowercase conversion feature
+- Added `--lower` and `--no-lower` flags
 
 ### v1.0.2
-- **Lowercase conversion**: Added automatic conversion of all URLs to lowercase for consistent processing
-- **Enhanced pipeline**: Lowercase conversion is now the first step in the cleaning pipeline
-- **Improved deduplication**: Better deduplication through case-insensitive URL processing
-- **New flags**: Added `--lower` and `--no-lower` options
-- **Updated examples**: Example files now include mixed-case URLs
+- Added lowercase conversion feature
+- Added `--lower` and `--no-lower` flags
 
 ### v1.0.1
-- **Enhanced character cleaning**: Added exclamation mark (`!`) to the list of characters that are automatically removed from URLs
-- **Improved documentation**: Updated all documentation to reflect the new character cleaning capabilities
-- **Updated help text**: Command-line help now shows the complete list of characters being cleaned
-- **Enhanced tests**: Added comprehensive tests for exclamation mark removal
-- **Updated examples**: Example files now include URLs with exclamation marks
+- Added exclamation mark (`!`) to character cleaning
+- Updated documentation and tests
 
 ### v1.0.0
-- **Initial release**: First stable version of CleanURL
-- **Character cleaning**: Remove unnecessary quotes (`'` and `"`) from URLs
-- **HTTP/HTTPS deduplication**: Remove HTTP duplicates when HTTPS version exists
-- **Trailing slash removal**: Remove trailing slashes to deduplicate URLs
-- **Command-line interface**: Configurable options with both positive and negative flags
-- **Comprehensive test suite**: Full test coverage for all functionality
-- **Cross-platform support**: Works on Windows, macOS, and Linux 
+- Initial release with character cleaning, HTTP/HTTPS deduplication, and trailing slash removal 
