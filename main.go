@@ -112,40 +112,35 @@ func cleanURLs(urls []string) []string {
 	// Step 2: Create maps for tracking
 	urlMap := make(map[string]bool)
 	httpsMap := make(map[string]bool)
-	noSlashMap := make(map[string]bool)
 	var result []string
 
-	// First pass: collect HTTPS URLs and URLs without trailing slashes
+	// First pass: collect HTTPS URLs
 	for _, url := range urls {
 		// Track HTTPS URLs
 		if strings.HasPrefix(url, "https://") {
 			httpsMap[strings.Replace(url, "https://", "http://", 1)] = true
 		}
-		
-		// Track URLs without trailing slashes
-		noSlash := strings.TrimSuffix(url, "/")
-		if url != noSlash {
-			noSlashMap[noSlash] = true
-		}
 	}
+	
+
 
 	// Second pass: process URLs
 	for _, url := range urls {
 		processedURL := url
 		shouldAdd := true
 
-		// Handle HTTP/HTTPS duplicates
-		if cleanHTTP && strings.HasPrefix(url, "http://") {
-			if httpsMap[url] {
-				shouldAdd = false // Skip HTTP if HTTPS exists
+		// Handle trailing slashes first
+		if backslash {
+			noSlash := strings.TrimSuffix(url, "/")
+			if url != noSlash {
+				processedURL = noSlash // Always remove trailing slash
 			}
 		}
 
-		// Handle trailing slashes
-		if backslash && shouldAdd {
-			noSlash := strings.TrimSuffix(url, "/")
-			if url != noSlash && noSlashMap[noSlash] {
-				shouldAdd = false // Skip URL with trailing slash if version without exists
+		// Handle HTTP/HTTPS duplicates (check the processed URL)
+		if cleanHTTP && strings.HasPrefix(processedURL, "http://") {
+			if httpsMap[processedURL] {
+				shouldAdd = false // Skip HTTP if HTTPS exists
 			}
 		}
 
