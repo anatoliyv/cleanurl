@@ -82,7 +82,7 @@ echo "https://example.com" | cleanurl --no-characters --no-clean-http
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `--help` | Show help information | - |
+| `-h, --help` | Show help information | - |
 | `--lower` | Convert URLs to lowercase | `true` |
 | `--characters` | Remove unnecessary characters (quotes and exclamation marks) from URLs | `true` |
 | `--clean-http` | Remove HTTP duplicates when HTTPS version exists | `true` |
@@ -177,6 +177,48 @@ https://test.com
 https://unique.com
 ```
 
+### Example 5: Lowercase Conversion and Character Cleaning
+
+**Input:**
+```
+"HTTPS://EXAMPLE.COM/"
+!https://UPPERCASE.com!
+'https://MixedCase.Com/'
+```
+
+**Command:**
+```bash
+echo -e '"HTTPS://EXAMPLE.COM/"\n!https://UPPERCASE.com!\n'\''https://MixedCase.Com/'\'' | cleanurl
+```
+
+**Output:**
+```
+https://example.com
+https://uppercase.com
+https://mixedcase.com
+```
+
+### Example 6: Disable Multiple Features
+
+**Input:**
+```
+"HTTPS://EXAMPLE.COM/"
+!https://UPPERCASE.com!
+'https://MixedCase.Com/'
+```
+
+**Command:**
+```bash
+echo -e '"HTTPS://EXAMPLE.COM/"\n!https://UPPERCASE.com!\n'\''https://MixedCase.Com/'\'' | cleanurl --no-lower --no-characters
+```
+
+**Output:**
+```
+"HTTPS://EXAMPLE.COM/"
+!https://UPPERCASE.com!
+'https://MixedCase.Com/'
+```
+
 ## How It Works
 
 CleanURL processes URLs through the following pipeline:
@@ -190,13 +232,13 @@ CleanURL processes URLs through the following pipeline:
    - Example: `"https://example.com"` → `https://example.com`
    - Example: `!https://example.com!` → `https://example.com`
 
-2. **HTTP/HTTPS Deduplication** (enabled by default)
+3. **Trailing Slash Removal** (enabled by default)
+   - Always removes trailing slashes for consistency
+   - Example: `https://example.com/` → `https://example.com`
+
+4. **HTTP/HTTPS Deduplication** (enabled by default)
    - If both HTTP and HTTPS versions of the same URL exist, keeps only HTTPS
    - Example: `http://example.com` + `https://example.com` → `https://example.com`
-
-3. **Trailing Slash Removal** (enabled by default)
-   - Removes trailing slashes to deduplicate URLs
-   - Example: `https://example.com/` + `https://example.com` → `https://example.com`
 
 ## Testing
 
@@ -270,10 +312,38 @@ If you encounter any issues or have questions, please:
 
 ## Changelog
 
+### v1.0.4 (Latest)
+- **Fixed trailing slash removal**: Now consistently removes trailing slashes from all URLs
+- **Improved HTTP/HTTPS deduplication**: Better logic for handling processed URLs
+- **Enhanced deduplication**: Fixed bug where trailing slashes weren't being removed properly
+- **All tests passing**: Comprehensive test coverage maintained
+
+### v1.0.3
+- **Lowercase conversion**: Added automatic conversion of all URLs to lowercase for consistent processing
+- **Enhanced pipeline**: Lowercase conversion is now the first step in the cleaning pipeline
+- **Improved deduplication**: Better deduplication through case-insensitive URL processing
+- **New flags**: Added `--lower` and `--no-lower` options
+- **Updated examples**: Example files now include mixed-case URLs
+
+### v1.0.2
+- **Lowercase conversion**: Added automatic conversion of all URLs to lowercase for consistent processing
+- **Enhanced pipeline**: Lowercase conversion is now the first step in the cleaning pipeline
+- **Improved deduplication**: Better deduplication through case-insensitive URL processing
+- **New flags**: Added `--lower` and `--no-lower` options
+- **Updated examples**: Example files now include mixed-case URLs
+
+### v1.0.1
+- **Enhanced character cleaning**: Added exclamation mark (`!`) to the list of characters that are automatically removed from URLs
+- **Improved documentation**: Updated all documentation to reflect the new character cleaning capabilities
+- **Updated help text**: Command-line help now shows the complete list of characters being cleaned
+- **Enhanced tests**: Added comprehensive tests for exclamation mark removal
+- **Updated examples**: Example files now include URLs with exclamation marks
+
 ### v1.0.0
-- Initial release
-- Character cleaning (quotes removal)
-- HTTP/HTTPS deduplication
-- Trailing slash removal
-- Command-line interface with configurable options
-- Comprehensive test suite 
+- **Initial release**: First stable version of CleanURL
+- **Character cleaning**: Remove unnecessary quotes (`'` and `"`) from URLs
+- **HTTP/HTTPS deduplication**: Remove HTTP duplicates when HTTPS version exists
+- **Trailing slash removal**: Remove trailing slashes to deduplicate URLs
+- **Command-line interface**: Configurable options with both positive and negative flags
+- **Comprehensive test suite**: Full test coverage for all functionality
+- **Cross-platform support**: Works on Windows, macOS, and Linux 
