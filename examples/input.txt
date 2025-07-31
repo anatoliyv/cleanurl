@@ -1,0 +1,13 @@
+"https://example.com/"
+http://example.com
+https://example.com
+'https://test.com/'
+https://test.com
+https://unique.com/
+"https://quoted-url.com"
+'https://single-quoted.com'
+https://no-quotes.com
+http://http-only.com
+https://https-only.com
+https://trailing-slash.com/
+https://no-trailing-slash.com 
