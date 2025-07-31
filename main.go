@@ -22,7 +22,7 @@ var rootCmd = &cobra.Command{
 	Long: `CleanURL is a command-line tool that processes URLs from stdin and applies various cleaning operations.
 
 Features:
-- Remove unnecessary characters (quotes) from URLs
+- Remove unnecessary characters (quotes and exclamation marks) from URLs
 - Remove HTTP duplicates when HTTPS version exists
 - Remove trailing slashes to deduplicate URLs
 - Output cleaned URLs to stdout
@@ -36,7 +36,7 @@ Examples:
 
 func init() {
 	// Set default values to true (on by default)
-	rootCmd.Flags().BoolVar(&characters, "characters", true, "Remove unnecessary characters (quotes) from URLs")
+	rootCmd.Flags().BoolVar(&characters, "characters", true, "Remove unnecessary characters (quotes and exclamation marks) from URLs")
 	rootCmd.Flags().BoolVar(&cleanHTTP, "clean-http", true, "Remove HTTP duplicates when HTTPS version exists")
 	rootCmd.Flags().BoolVar(&backslash, "backslash", true, "Remove trailing slashes to deduplicate URLs")
 	
@@ -153,7 +153,7 @@ func removeUnnecessaryCharacters(urls []string) []string {
 	}
 	var result []string
 	for _, url := range urls {
-		cleaned := strings.Trim(url, `"'`)
+		cleaned := strings.Trim(url, `"'!`)
 		result = append(result, cleaned)
 	}
 	return result

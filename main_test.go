@@ -29,6 +29,16 @@ func TestRemoveUnnecessaryCharacters(t *testing.T) {
 			expected: []string{"https://example.com", "https://test.com"},
 		},
 		{
+			name:     "Remove exclamation marks",
+			input:    []string{"!https://example.com!", "https://test.com"},
+			expected: []string{"https://example.com", "https://test.com"},
+		},
+		{
+			name:     "Remove mixed characters",
+			input:    []string{`"https://example.com"`, "'https://test.com'", "!https://another.com!"},
+			expected: []string{"https://example.com", "https://test.com", "https://another.com"},
+		},
+		{
 			name:     "No quotes to remove",
 			input:    []string{"https://example.com", "https://test.com"},
 			expected: []string{"https://example.com", "https://test.com"},
