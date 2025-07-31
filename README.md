@@ -21,7 +21,7 @@ A fast and efficient command-line tool for cleaning and deduplicating URLs from 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/cleanurl.git
+git clone https://github.com/anatoliyv/cleanurl.git
 cd cleanurl
 ```
 
@@ -42,7 +42,7 @@ copy cleanurl.exe C:\Windows\System32\
 ### Using Go Install
 
 ```bash
-go install github.com/yourusername/cleanurl@latest
+go install github.com/anatoliyv/cleanurl@latest
 ```
 
 ## Usage
@@ -256,7 +256,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues or have questions, please:
 
-1. Check the [Issues](https://github.com/yourusername/cleanurl/issues) page
+1. Check the [Issues](https://github.com/anatoliyv/cleanurl/issues) page
 2. Create a new issue with a detailed description of the problem
 3. Include your operating system and Go version
 

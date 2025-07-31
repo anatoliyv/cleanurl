@@ -1,4 +1,4 @@
-module github.com/cleanurl
+module github.com/anatoliyv/cleanurl
 
 go 1.21
 

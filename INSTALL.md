@@ -12,7 +12,7 @@ This guide will help you install and run the CleanURL tool on your local machine
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/cleanurl.git
+git clone https://github.com/anatoliyv/cleanurl.git
 cd cleanurl
 ```
 
@@ -57,7 +57,7 @@ copy cleanurl.exe C:\Windows\System32\
 If the repository is published to GitHub, you can install directly:
 
 ```bash
-go install github.com/yourusername/cleanurl@latest
+go install github.com/anatoliyv/cleanurl@latest
 ```
 
 ### Using Make (if available)
@@ -108,7 +108,7 @@ If you encounter any issues:
 
 1. Check the [README.md](README.md) for usage examples
 2. Run `./cleanurl --help` for command-line options
-3. Check the [Issues](https://github.com/yourusername/cleanurl/issues) page
+3. Check the [Issues](https://github.com/anatoliyv/cleanurl/issues) page
 4. Create a new issue with details about your problem
 
 ## Development Setup
@@ -117,7 +117,7 @@ For developers who want to contribute:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cleanurl.git
+git clone https://github.com/anatoliyv/cleanurl.git
 cd cleanurl
 
 # Install dependencies
