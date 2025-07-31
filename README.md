@@ -4,6 +4,7 @@ A fast and efficient command-line tool for cleaning and deduplicating URLs from 
 
 ## Features
 
+- **Lowercase Conversion**: Convert all URLs to lowercase for consistent processing
 - **Character Cleaning**: Remove unnecessary quotes (`'` and `"`) and exclamation marks (`!`) from URLs
 - **HTTP/HTTPS Deduplication**: Remove HTTP duplicates when HTTPS version exists
 - **Trailing Slash Removal**: Remove trailing slashes to deduplicate URLs
@@ -82,9 +83,11 @@ echo "https://example.com" | cleanurl --no-characters --no-clean-http
 | Flag | Description | Default |
 |------|-------------|---------|
 | `--help` | Show help information | - |
+| `--lower` | Convert URLs to lowercase | `true` |
 | `--characters` | Remove unnecessary characters (quotes and exclamation marks) from URLs | `true` |
 | `--clean-http` | Remove HTTP duplicates when HTTPS version exists | `true` |
 | `--backslash` | Remove trailing slashes to deduplicate URLs | `true` |
+| `--no-lower` | Disable lowercase conversion | - |
 | `--no-characters` | Disable character cleaning | - |
 | `--no-clean-http` | Disable HTTP cleaning | - |
 | `--no-backslash` | Disable backslash cleaning | - |
@@ -178,7 +181,11 @@ https://unique.com
 
 CleanURL processes URLs through the following pipeline:
 
-1. **Character Cleaning** (enabled by default)
+1. **Lowercase Conversion** (enabled by default)
+   - Converts all URLs to lowercase for consistent processing
+   - Example: `HTTPS://EXAMPLE.COM` → `https://example.com`
+
+2. **Character Cleaning** (enabled by default)
    - Removes single quotes (`'`), double quotes (`"`), and exclamation marks (`!`) from URLs
    - Example: `"https://example.com"` → `https://example.com`
    - Example: `!https://example.com!` → `https://example.com`

@@ -14,6 +14,7 @@ var (
 	characters bool
 	cleanHTTP  bool
 	backslash  bool
+	lower      bool
 )
 
 var rootCmd = &cobra.Command{
@@ -22,6 +23,7 @@ var rootCmd = &cobra.Command{
 	Long: `CleanURL is a command-line tool that processes URLs from stdin and applies various cleaning operations.
 
 Features:
+- Convert URLs to lowercase for consistent processing
 - Remove unnecessary characters (quotes and exclamation marks) from URLs
 - Remove HTTP duplicates when HTTPS version exists
 - Remove trailing slashes to deduplicate URLs
@@ -39,11 +41,13 @@ func init() {
 	rootCmd.Flags().BoolVar(&characters, "characters", true, "Remove unnecessary characters (quotes and exclamation marks) from URLs")
 	rootCmd.Flags().BoolVar(&cleanHTTP, "clean-http", true, "Remove HTTP duplicates when HTTPS version exists")
 	rootCmd.Flags().BoolVar(&backslash, "backslash", true, "Remove trailing slashes to deduplicate URLs")
+	rootCmd.Flags().BoolVar(&lower, "lower", true, "Convert URLs to lowercase")
 	
 	// Add negative flags for convenience
 	rootCmd.Flags().Bool("no-characters", false, "Disable character cleaning")
 	rootCmd.Flags().Bool("no-clean-http", false, "Disable HTTP cleaning")
 	rootCmd.Flags().Bool("no-backslash", false, "Disable backslash cleaning")
+	rootCmd.Flags().Bool("no-lower", false, "Disable lowercase conversion")
 }
 
 func runCleanURL(cmd *cobra.Command, args []string) {
@@ -56,6 +60,9 @@ func runCleanURL(cmd *cobra.Command, args []string) {
 	}
 	if cmd.Flag("no-backslash").Changed {
 		backslash = false
+	}
+	if cmd.Flag("no-lower").Changed {
+		lower = false
 	}
 
 	// Read URLs from stdin
@@ -92,7 +99,12 @@ func cleanURLs(urls []string) []string {
 		return []string{}
 	}
 
-	// Step 1: Remove unnecessary characters
+	// Step 1: Convert to lowercase
+	if lower {
+		urls = convertToLowercase(urls)
+	}
+
+	// Step 2: Remove unnecessary characters
 	if characters {
 		urls = removeUnnecessaryCharacters(urls)
 	}
@@ -144,6 +156,17 @@ func cleanURLs(urls []string) []string {
 		}
 	}
 
+	return result
+}
+
+func convertToLowercase(urls []string) []string {
+	if len(urls) == 0 {
+		return []string{}
+	}
+	var result []string
+	for _, url := range urls {
+		result = append(result, strings.ToLower(url))
+	}
 	return result
 }
 

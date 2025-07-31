@@ -7,6 +7,42 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConvertToLowercase(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		expected []string
+	}{
+		{
+			name:     "Convert mixed case URLs",
+			input:    []string{"HTTPS://EXAMPLE.COM", "Http://Test.Com", "https://lowercase.com"},
+			expected: []string{"https://example.com", "http://test.com", "https://lowercase.com"},
+		},
+		{
+			name:     "Convert uppercase URLs",
+			input:    []string{"HTTPS://EXAMPLE.COM", "HTTP://TEST.COM"},
+			expected: []string{"https://example.com", "http://test.com"},
+		},
+		{
+			name:     "Already lowercase URLs",
+			input:    []string{"https://example.com", "http://test.com"},
+			expected: []string{"https://example.com", "http://test.com"},
+		},
+		{
+			name:     "Empty input",
+			input:    []string{},
+			expected: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := convertToLowercase(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
 func TestRemoveUnnecessaryCharacters(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -67,6 +103,7 @@ func TestCleanURLs(t *testing.T) {
 		characters  bool
 		cleanHTTP   bool
 		backslash   bool
+		lower       bool
 		expected    []string
 	}{
 		{
@@ -75,6 +112,7 @@ func TestCleanURLs(t *testing.T) {
 			characters:  true,
 			cleanHTTP:   true,
 			backslash:   true,
+			lower:       true,
 			expected:    []string{"https://example.com"},
 		},
 		{
@@ -83,6 +121,7 @@ func TestCleanURLs(t *testing.T) {
 			characters:  false,
 			cleanHTTP:   true,
 			backslash:   true,
+			lower:       true,
 			expected:    []string{`"https://example.com"`, "https://test.com"},
 		},
 		{
@@ -91,6 +130,7 @@ func TestCleanURLs(t *testing.T) {
 			characters:  true,
 			cleanHTTP:   false,
 			backslash:   true,
+			lower:       true,
 			expected:    []string{"http://example.com", "https://example.com"},
 		},
 		{
@@ -99,6 +139,7 @@ func TestCleanURLs(t *testing.T) {
 			characters:  true,
 			cleanHTTP:   true,
 			backslash:   false,
+			lower:       true,
 			expected:    []string{"https://example.com/", "https://example.com"},
 		},
 		{
@@ -107,6 +148,7 @@ func TestCleanURLs(t *testing.T) {
 			characters:  true,
 			cleanHTTP:   true,
 			backslash:   true,
+			lower:       true,
 			expected:    []string{},
 		},
 		{
@@ -115,7 +157,17 @@ func TestCleanURLs(t *testing.T) {
 			characters:  true,
 			cleanHTTP:   true,
 			backslash:   true,
+			lower:       true,
 			expected:    []string{"https://example.com", "https://test.com"},
+		},
+		{
+			name:        "Lowercase conversion with mixed case",
+			input:       []string{"HTTPS://EXAMPLE.COM", "Http://Test.Com", "!https://UPPERCASE.com!"},
+			characters:  true,
+			cleanHTTP:   true,
+			backslash:   true,
+			lower:       true,
+			expected:    []string{"https://example.com", "http://test.com", "https://uppercase.com"},
 		},
 	}
 
@@ -125,6 +177,7 @@ func TestCleanURLs(t *testing.T) {
 			characters = tt.characters
 			cleanHTTP = tt.cleanHTTP
 			backslash = tt.backslash
+			lower = tt.lower
 
 			result := cleanURLs(tt.input)
 			assert.Equal(t, tt.expected, result)
@@ -242,6 +295,7 @@ https://unique.com`
 	characters = true
 	cleanHTTP = true
 	backslash = true
+	lower = true
 
 	urls := readURLsFromStdin()
 	result := cleanURLs(urls)
@@ -263,6 +317,9 @@ func TestCommandLineFlags(t *testing.T) {
 	backslashFlag := rootCmd.Flags().Lookup("backslash")
 	assert.NotNil(t, backslashFlag)
 	
+	lowerFlag := rootCmd.Flags().Lookup("lower")
+	assert.NotNil(t, lowerFlag)
+	
 	// Test that negative flags exist
 	noCharactersFlag := rootCmd.Flags().Lookup("no-characters")
 	assert.NotNil(t, noCharactersFlag)
@@ -272,4 +329,7 @@ func TestCommandLineFlags(t *testing.T) {
 	
 	noBackslashFlag := rootCmd.Flags().Lookup("no-backslash")
 	assert.NotNil(t, noBackslashFlag)
+	
+	noLowerFlag := rootCmd.Flags().Lookup("no-lower")
+	assert.NotNil(t, noLowerFlag)
 } 

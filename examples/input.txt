@@ -9,6 +9,8 @@ https://unique.com/
 !https://exclamation-url.com!
 https://no-quotes.com
 http://http-only.com
+HTTPS://UPPERCASE.COM
+Http://MixedCase.Com
 https://https-only.com
 https://trailing-slash.com/
 https://no-trailing-slash.com 
