@@ -1,5 +1,57 @@
 # Release Notes - CleanURL
 
+## 🎉 Release v1.0.2
+
+**Release Date**: January 2025  
+**Version**: 1.0.2  
+**Repository**: https://github.com/anatoliyv/cleanurl
+
+### ✨ New Features
+
+- **Lowercase Conversion**: Added automatic conversion of all URLs to lowercase for consistent processing
+- **Enhanced Pipeline**: Lowercase conversion is now the first step in the cleaning pipeline
+- **Improved Deduplication**: Better deduplication through case-insensitive URL processing
+
+### 🔧 Changes
+
+- **New Flag**: `--lower` (enabled by default) to control lowercase conversion
+- **New Flag**: `--no-lower` to disable lowercase conversion
+- **Updated Pipeline**: Processing order is now: lowercase → character cleaning → HTTP deduplication → trailing slash removal
+- **Enhanced Tests**: Added comprehensive tests for lowercase conversion functionality
+- **Updated Examples**: Example files now include mixed-case URLs
+
+### 🎯 Usage Examples
+
+```bash
+# Convert to lowercase
+echo 'HTTPS://EXAMPLE.COM' | cleanurl
+# Output: https://example.com
+
+# Convert mixed case with character cleaning
+echo '!HTTPS://UPPERCASE.COM!' | cleanurl
+# Output: https://uppercase.com
+
+# Disable lowercase conversion
+echo 'HTTPS://EXAMPLE.COM' | cleanurl --no-lower
+# Output: HTTPS://EXAMPLE.COM
+```
+
+### 📦 Downloads
+
+Pre-built binaries for v1.0.2:
+- **Linux (amd64)**: `cleanurl-linux`
+- **macOS (amd64)**: `cleanurl-darwin`
+- **Windows (amd64)**: `cleanurl-windows.exe`
+
+### 🚀 Installation
+
+```bash
+# Update to latest version
+go install github.com/anatoliyv/cleanurl@latest
+```
+
+---
+
 ## 🎉 Release v1.0.1
 
 **Release Date**: January 2025  
