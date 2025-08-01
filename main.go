@@ -15,6 +15,7 @@ var (
 	cleanHTTP  bool
 	backslash  bool
 	lower      bool
+	onlyDomains bool
 )
 
 var rootCmd = &cobra.Command{
@@ -27,12 +28,14 @@ Features:
 - Remove unnecessary characters (quotes and exclamation marks) from URLs
 - Remove HTTP duplicates when HTTPS version exists
 - Remove trailing slashes to deduplicate URLs
+- Extract unique domain names from URLs (--only-domains)
 - Output cleaned URLs to stdout
 
 Examples:
   echo "https://example.com/" | cleanurl
   cat urls.txt | cleanurl --no-characters
-  echo "http://example.com" | cleanurl --no-clean-http`,
+  echo "http://example.com" | cleanurl --no-clean-http
+  echo "https://example.com/path" | cleanurl --only-domains`,
 	Run: runCleanURL,
 }
 
@@ -42,6 +45,7 @@ func init() {
 	rootCmd.Flags().BoolVar(&cleanHTTP, "clean-http", true, "Remove HTTP duplicates when HTTPS version exists")
 	rootCmd.Flags().BoolVar(&backslash, "backslash", true, "Remove trailing slashes to deduplicate URLs")
 	rootCmd.Flags().BoolVar(&lower, "lower", true, "Convert URLs to lowercase")
+	rootCmd.Flags().BoolVar(&onlyDomains, "only-domains", false, "Extract only unique domain names from URLs")
 	
 	// Add negative flags for convenience
 	rootCmd.Flags().Bool("no-characters", false, "Disable character cleaning")
@@ -69,7 +73,12 @@ func runCleanURL(cmd *cobra.Command, args []string) {
 	urls := readURLsFromStdin()
 	
 	// Apply cleaning operations
-	cleanedURLs := cleanURLs(urls)
+	var cleanedURLs []string
+	if onlyDomains {
+		cleanedURLs = extractUniqueDomains(urls)
+	} else {
+		cleanedURLs = cleanURLs(urls)
+	}
 	
 	// Output results
 	for _, url := range cleanedURLs {
@@ -177,6 +186,55 @@ func removeUnnecessaryCharacters(urls []string) []string {
 	return result
 }
 
+func extractUniqueDomains(urls []string) []string {
+	if len(urls) == 0 {
+		return []string{}
+	}
+	
+	domainMap := make(map[string]bool)
+	var result []string
+	
+	for _, url := range urls {
+		// Convert to lowercase first
+		url = strings.ToLower(url)
+		
+		// Remove unnecessary characters
+		url = strings.Trim(url, `"'!`)
+		
+		// Extract domain
+		domain := extractDomain(url)
+		if domain != "" && !domainMap[domain] {
+			domainMap[domain] = true
+			result = append(result, domain)
+		}
+	}
+	
+	return result
+}
+
+func extractDomain(url string) string {
+	// Remove protocol
+	if strings.HasPrefix(url, "http://") {
+		url = strings.TrimPrefix(url, "http://")
+	} else if strings.HasPrefix(url, "https://") {
+		url = strings.TrimPrefix(url, "https://")
+	}
+	
+	// Remove www. prefix if present
+	if strings.HasPrefix(url, "www.") {
+		url = strings.TrimPrefix(url, "www.")
+	}
+	
+	// Get the domain part (before the first slash or path)
+	if idx := strings.Index(url, "/"); idx != -1 {
+		url = url[:idx]
+	}
+	
+	// Remove trailing slash if present
+	url = strings.TrimSuffix(url, "/")
+	
+	return url
+}
 
 
 func main() {
