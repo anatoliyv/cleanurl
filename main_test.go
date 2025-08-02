@@ -169,6 +169,42 @@ func TestCleanURLs(t *testing.T) {
 			lower:       true,
 			expected:    []string{"https://example.com", "http://test.com", "https://uppercase.com"},
 		},
+		{
+			name:        "URLs with ports - HTTP/HTTPS deduplication",
+			input:       []string{"https://example.com:8080/path", "http://example.com:8080/path"},
+			characters:  true,
+			cleanHTTP:   true,
+			backslash:   true,
+			lower:       true,
+			expected:    []string{"https://example.com:8080/path"},
+		},
+		{
+			name:        "URLs with different ports - no deduplication",
+			input:       []string{"https://example.com:8080/path", "http://example.com:9090/path"},
+			characters:  true,
+			cleanHTTP:   true,
+			backslash:   true,
+			lower:       true,
+			expected:    []string{"https://example.com:8080/path", "http://example.com:9090/path"},
+		},
+		{
+			name:        "URLs with ports and trailing slashes",
+			input:       []string{"https://example.com:8080/path/", "http://example.com:8080/path/"},
+			characters:  true,
+			cleanHTTP:   true,
+			backslash:   true,
+			lower:       true,
+			expected:    []string{"https://example.com:8080/path"},
+		},
+		{
+			name:        "Complex port scenarios with special characters",
+			input:       []string{"'https://EXAMPLE.com:8080/path/'", `"http://example.com:9090/another"`, "https://www.EXAMPLE.com:443/different"},
+			characters:  true,
+			cleanHTTP:   true,
+			backslash:   true,
+			lower:       true,
+			expected:    []string{"https://example.com:8080/path", "http://example.com:9090/another", "https://www.example.com:443/different"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -258,12 +294,17 @@ http://example.com
 https://example.com
 'https://test.com/'
 https://test.com
-https://unique.com`
+https://unique.com
+https://example.com:8080/path
+http://example.com:8080/path
+https://test.com:9090/another`
 
 	expected := []string{
 		"https://example.com",
 		"https://test.com",
 		"https://unique.com",
+		"https://example.com:8080/path",
+		"https://test.com:9090/another",
 	}
 
 	// Create a temporary file with test input
@@ -320,6 +361,9 @@ func TestCommandLineFlags(t *testing.T) {
 	lowerFlag := rootCmd.Flags().Lookup("lower")
 	assert.NotNil(t, lowerFlag)
 	
+	onlyDomainsFlag := rootCmd.Flags().Lookup("only-domains")
+	assert.NotNil(t, onlyDomainsFlag)
+	
 	// Test that negative flags exist
 	noCharactersFlag := rootCmd.Flags().Lookup("no-characters")
 	assert.NotNil(t, noCharactersFlag)
@@ -332,4 +376,207 @@ func TestCommandLineFlags(t *testing.T) {
 	
 	noLowerFlag := rootCmd.Flags().Lookup("no-lower")
 	assert.NotNil(t, noLowerFlag)
+}
+
+func TestExtractDomain(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Basic HTTPS URL",
+			input:    "https://example.com/path",
+			expected: "example.com",
+		},
+		{
+			name:     "Basic HTTP URL",
+			input:    "http://example.com/path",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with port",
+			input:    "https://example.com:8080/path",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with different port",
+			input:    "http://example.com:9090/path",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with www prefix",
+			input:    "https://www.example.com/path",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with www prefix and port",
+			input:    "https://www.example.com:8080/path",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with trailing slash",
+			input:    "https://example.com/path/",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with port and trailing slash",
+			input:    "https://example.com:8080/path/",
+			expected: "example.com",
+		},
+		{
+			name:     "Domain only with port",
+			input:    "https://example.com:8080",
+			expected: "example.com",
+		},
+		{
+			name:     "Domain only without port",
+			input:    "https://example.com",
+			expected: "example.com",
+		},
+		{
+			name:     "Complex path with port",
+			input:    "https://example.com:8080/path/to/resource?param=value",
+			expected: "example.com",
+		},
+		{
+			name:     "IP address with port",
+			input:    "https://192.168.1.1:8080/path",
+			expected: "192.168.1.1",
+		},
+		{
+			name:     "Empty input",
+			input:    "",
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := extractDomain(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestNormalizeURLForComparison(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "HTTPS URL",
+			input:    "https://example.com/path",
+			expected: "example.com/path",
+		},
+		{
+			name:     "HTTP URL",
+			input:    "http://example.com/path",
+			expected: "example.com/path",
+		},
+		{
+			name:     "HTTPS URL with port",
+			input:    "https://example.com:8080/path",
+			expected: "example.com:8080/path",
+		},
+		{
+			name:     "HTTP URL with port",
+			input:    "http://example.com:8080/path",
+			expected: "example.com:8080/path",
+		},
+		{
+			name:     "URL with trailing slash",
+			input:    "https://example.com/path/",
+			expected: "example.com/path",
+		},
+		{
+			name:     "URL with port and trailing slash",
+			input:    "https://example.com:8080/path/",
+			expected: "example.com:8080/path",
+		},
+		{
+			name:     "Domain only with trailing slash",
+			input:    "https://example.com/",
+			expected: "example.com",
+		},
+		{
+			name:     "Domain with port and trailing slash",
+			input:    "https://example.com:8080/",
+			expected: "example.com:8080",
+		},
+		{
+			name:     "Empty input",
+			input:    "",
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := normalizeURLForComparison(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestExtractUniqueDomains(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []string
+		expected []string
+	}{
+		{
+			name:     "Basic domains",
+			input:    []string{"https://example.com/path", "https://test.com/another"},
+			expected: []string{"example.com", "test.com"},
+		},
+		{
+			name:     "Domains with ports",
+			input:    []string{"https://example.com:8080/path", "http://test.com:9090/another"},
+			expected: []string{"example.com", "test.com"},
+		},
+		{
+			name:     "Same domain with different ports",
+			input:    []string{"https://example.com:8080/path", "http://example.com:9090/another"},
+			expected: []string{"example.com"},
+		},
+		{
+			name:     "Mixed case domains",
+			input:    []string{"https://EXAMPLE.com:8080/path", "http://example.com:9090/another"},
+			expected: []string{"example.com"},
+		},
+		{
+			name:     "Domains with special characters",
+			input:    []string{"'https://example.com:8080/path'", `"http://test.com:9090/another"`},
+			expected: []string{"example.com", "test.com"},
+		},
+		{
+			name:     "Domains with www prefix",
+			input:    []string{"https://www.example.com:8080/path", "http://example.com:9090/another"},
+			expected: []string{"example.com"},
+		},
+		{
+			name:     "Complex deduplication with ports",
+			input:    []string{
+				"https://example.com:8080/path",
+				"http://example.com:8080/path",
+				"https://www.example.com:9090/another",
+				"http://test.com:8080/different",
+			},
+			expected: []string{"example.com", "test.com"},
+		},
+		{
+			name:     "Empty input",
+			input:    []string{},
+			expected: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := extractUniqueDomains(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 } 

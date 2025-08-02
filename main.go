@@ -125,14 +125,13 @@ func cleanURLs(urls []string) []string {
 
 	// First pass: collect HTTPS URLs
 	for _, url := range urls {
-		// Track HTTPS URLs
+		// Track HTTPS URLs by their normalized form
 		if strings.HasPrefix(url, "https://") {
-			httpsMap[strings.Replace(url, "https://", "http://", 1)] = true
+			normalized := normalizeURLForComparison(url)
+			httpsMap[normalized] = true
 		}
 	}
 	
-
-
 	// Second pass: process URLs
 	for _, url := range urls {
 		processedURL := url
@@ -148,7 +147,8 @@ func cleanURLs(urls []string) []string {
 
 		// Handle HTTP/HTTPS duplicates (check the processed URL)
 		if cleanHTTP && strings.HasPrefix(processedURL, "http://") {
-			if httpsMap[processedURL] {
+			normalized := normalizeURLForComparison(processedURL)
+			if httpsMap[normalized] {
 				shouldAdd = false // Skip HTTP if HTTPS exists
 			}
 		}
@@ -184,6 +184,21 @@ func removeUnnecessaryCharacters(urls []string) []string {
 		result = append(result, cleaned)
 	}
 	return result
+}
+
+// normalizeURLForComparison removes protocol and trailing slash for HTTP/HTTPS comparison
+func normalizeURLForComparison(url string) string {
+	// Remove protocol
+	if strings.HasPrefix(url, "https://") {
+		url = strings.TrimPrefix(url, "https://")
+	} else if strings.HasPrefix(url, "http://") {
+		url = strings.TrimPrefix(url, "http://")
+	}
+	
+	// Remove trailing slash
+	url = strings.TrimSuffix(url, "/")
+	
+	return url
 }
 
 func extractUniqueDomains(urls []string) []string {
@@ -232,6 +247,11 @@ func extractDomain(url string) string {
 	
 	// Remove trailing slash if present
 	url = strings.TrimSuffix(url, "/")
+	
+	// Remove port if present (everything after the last colon)
+	if idx := strings.LastIndex(url, ":"); idx != -1 {
+		url = url[:idx]
+	}
 	
 	return url
 }
