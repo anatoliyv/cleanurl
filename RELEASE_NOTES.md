@@ -1,5 +1,128 @@
 # Release Notes - CleanURL
 
+## 🎉 Release v1.0.6
+
+**Release Date**: January 2025  
+**Version**: 1.0.6  
+**Repository**: https://github.com/anatoliyv/cleanurl
+
+### 🔧 Port Handling Improvements
+
+- **Domain Extraction**: Fixed domain extraction to properly remove port numbers from URLs
+- **HTTP/HTTPS Deduplication**: Enhanced to work correctly with URLs containing ports
+- **URL Normalization**: Added `normalizeURLForComparison()` helper for better port handling
+- **Comprehensive Testing**: Added extensive test coverage for port handling scenarios
+
+### ✨ New Features
+
+- **Port-Aware Processing**: All features now properly handle URLs with port numbers
+- **Enhanced Domain Extraction**: Ports are removed when extracting domains (e.g., `example.com:8080` → `example.com`)
+- **Improved Deduplication**: HTTP/HTTPS deduplication works with URLs containing ports
+
+### 🧪 Testing Enhancements
+
+- **New Test Functions**: Added `TestExtractDomain`, `TestNormalizeURLForComparison`, and `TestExtractUniqueDomains`
+- **Port Scenarios**: Comprehensive test coverage for URLs with ports
+- **Edge Cases**: Tests for IP addresses, complex paths, and special characters with ports
+- **Coverage**: Achieved 83.2% test coverage
+
+### 🎯 Usage Examples
+
+```bash
+# Domain extraction with ports
+echo -e "https://example.com:8080/path\nhttp://test.com:9090/another" | cleanurl --only-domains
+# Output: 
+# example.com
+# test.com
+
+# HTTP/HTTPS deduplication with ports
+echo -e "https://example.com:8080/path\nhttp://example.com:8080/path" | cleanurl
+# Output: https://example.com:8080/path
+
+# Complex port scenarios
+echo -e "'https://EXAMPLE.com:8080/path/'\n\"http://example.com:9090/another\"" | cleanurl
+# Output:
+# https://example.com:8080/path
+# http://example.com:9090/another
+```
+
+### 📦 Downloads
+
+Pre-built binaries for v1.0.6:
+- **Linux (amd64)**: `cleanurl-linux`
+- **macOS (amd64)**: `cleanurl-darwin`
+- **Windows (amd64)**: `cleanurl-windows.exe`
+
+### 🚀 Installation
+
+```bash
+# Install latest version
+go install github.com/anatoliyv/cleanurl@v1.0.6
+
+# Or use latest
+go install github.com/anatoliyv/cleanurl@latest
+```
+
+---
+
+## 🎉 Release v1.0.5
+
+**Release Date**: January 2025  
+**Version**: 1.0.5  
+**Repository**: https://github.com/anatoliyv/cleanurl
+
+### ✨ New Features
+
+- **Domain Extraction**: Added `--only-domains` flag to extract unique domain names from URLs
+- **Domain Processing**: Automatically converts to lowercase, removes protocol, www prefix, paths, and trailing slashes
+- **Port Handling**: Properly handles URLs with port numbers in domain extraction
+
+### 🔧 Changes
+
+- **New Flag**: `--only-domains` (disabled by default) to extract only domain names
+- **Domain Pipeline**: Processing includes lowercase conversion, character cleaning, and port removal
+- **Enhanced Help**: Updated command-line help with new feature and examples
+- **Updated Documentation**: Added examples and usage instructions for domain extraction
+
+### 🎯 Usage Examples
+
+```bash
+# Extract unique domains
+echo -e "https://example.com:8080/path\nhttp://test.com:9090/another" | cleanurl --only-domains
+# Output: 
+# example.com
+# test.com
+
+# Domain extraction with mixed case and special characters
+echo -e "'https://EXAMPLE.com:8080/path/'\n\"http://test.com:9090/another\"" | cleanurl --only-domains
+# Output:
+# example.com
+# test.com
+
+# Complex domain deduplication
+echo -e "https://www.example.com:8080/path\nhttp://example.com:9090/another" | cleanurl --only-domains
+# Output: example.com
+```
+
+### 📦 Downloads
+
+Pre-built binaries for v1.0.5:
+- **Linux (amd64)**: `cleanurl-linux`
+- **macOS (amd64)**: `cleanurl-darwin`
+- **Windows (amd64)**: `cleanurl-windows.exe`
+
+### 🚀 Installation
+
+```bash
+# Install latest version
+go install github.com/anatoliyv/cleanurl@v1.0.5
+
+# Or use latest
+go install github.com/anatoliyv/cleanurl@latest
+```
+
+---
+
 ## 🎉 Release v1.0.3
 
 **Release Date**: January 2025  

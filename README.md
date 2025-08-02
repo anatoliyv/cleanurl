@@ -8,6 +8,8 @@ A fast and efficient command-line tool for cleaning and deduplicating URLs from 
 - **Character Cleaning**: Remove unnecessary quotes (`'` and `"`) and exclamation marks (`!`) from URLs
 - **HTTP/HTTPS Deduplication**: Remove HTTP duplicates when HTTPS version exists
 - **Trailing Slash Removal**: Remove trailing slashes to deduplicate URLs
+- **Domain Extraction**: Extract unique domain names from URLs (with `--only-domains` flag)
+- **Port Handling**: Properly handle URLs with port numbers across all features
 - **Stream Processing**: Process URLs from stdin and output to stdout
 - **Configurable Options**: Enable/disable individual cleaning features
 - **Cross-Platform**: Works on Windows, macOS, and Linux
@@ -87,6 +89,7 @@ echo "https://example.com" | cleanurl --no-characters --no-clean-http
 | `--characters` | Remove unnecessary characters (quotes and exclamation marks) from URLs | `true` |
 | `--clean-http` | Remove HTTP duplicates when HTTPS version exists | `true` |
 | `--backslash` | Remove trailing slashes to deduplicate URLs | `true` |
+| `--only-domains` | Extract only unique domain names from URLs | `false` |
 | `--no-lower` | Disable lowercase conversion | - |
 | `--no-characters` | Disable character cleaning | - |
 | `--no-clean-http` | Disable HTTP cleaning | - |
@@ -198,7 +201,70 @@ https://uppercase.com
 https://mixedcase.com
 ```
 
-### Example 6: Disable Multiple Features
+### Example 6: Domain Extraction
+
+**Input:**
+```
+https://example.com:8080/path
+http://test.com:9090/another
+https://www.google.com:443/search
+http://example.com:8080/different
+```
+
+**Command:**
+```bash
+echo -e "https://example.com:8080/path\nhttp://test.com:9090/another\nhttps://www.google.com:443/search\nhttp://example.com:8080/different" | cleanurl --only-domains
+```
+
+**Output:**
+```
+example.com
+test.com
+google.com
+```
+
+### Example 7: Port Handling with HTTP/HTTPS Deduplication
+
+**Input:**
+```
+https://example.com:8080/path
+http://example.com:8080/path
+https://test.com:9090/another
+```
+
+**Command:**
+```bash
+echo -e "https://example.com:8080/path\nhttp://example.com:8080/path\nhttps://test.com:9090/another" | cleanurl
+```
+
+**Output:**
+```
+https://example.com:8080/path
+https://test.com:9090/another
+```
+
+### Example 8: Complex Port Scenarios
+
+**Input:**
+```
+'https://EXAMPLE.com:8080/path/'
+"http://example.com:9090/another"
+https://www.EXAMPLE.com:443/different
+```
+
+**Command:**
+```bash
+echo -e "'https://EXAMPLE.com:8080/path/'\n\"http://example.com:9090/another\"\nhttps://www.EXAMPLE.com:443/different" | cleanurl
+```
+
+**Output:**
+```
+https://example.com:8080/path
+http://example.com:9090/another
+https://www.example.com:443/different
+```
+
+### Example 9: Disable Multiple Features
 
 **Input:**
 ```
@@ -238,7 +304,20 @@ CleanURL processes URLs through the following pipeline:
 
 4. **HTTP/HTTPS Deduplication** (enabled by default)
    - If both HTTP and HTTPS versions of the same URL exist, keeps only HTTPS
-   - Example: `http://example.com` + `https://example.com` → `https://example.com`
+   - Works correctly with URLs containing ports
+   - Example: `http://example.com:8080/path` + `https://example.com:8080/path` → `https://example.com:8080/path`
+
+5. **Domain Extraction** (with `--only-domains` flag)
+   - Extracts unique domain names from URLs
+   - Removes protocol, www prefix, paths, and port numbers
+   - Example: `https://www.example.com:8080/path` → `example.com`
+
+### Port Handling
+
+CleanURL properly handles URLs with port numbers across all features:
+- **Domain extraction**: Ports are removed when extracting domains
+- **HTTP/HTTPS deduplication**: Works correctly with URLs containing ports
+- **All cleaning features**: Lowercase, character cleaning, and trailing slash removal work with ports
 
 ## Testing
 
@@ -312,7 +391,19 @@ If you encounter any issues or have questions, please:
 
 ## Changelog
 
-### v1.0.4 (Latest)
+### v1.0.6 (Latest)
+- **Port Handling**: Improved handling of URLs with port numbers across all features
+- **Domain Extraction**: Fixed domain extraction to properly remove port numbers
+- **HTTP/HTTPS Deduplication**: Enhanced to work correctly with URLs containing ports
+- **Test Coverage**: Added comprehensive tests for port handling scenarios (83.2% coverage)
+- **New Test Functions**: Added TestExtractDomain, TestNormalizeURLForComparison, and TestExtractUniqueDomains
+
+### v1.0.5
+- **Domain Extraction**: Added `--only-domains` flag to extract unique domain names from URLs
+- **Domain Processing**: Converts to lowercase, removes protocol, www prefix, paths, and trailing slashes
+- **Updated Documentation**: Added examples and help text for the new feature
+
+### v1.0.4
 - Fixed trailing slash removal logic
 - Improved HTTP/HTTPS deduplication
 
@@ -329,4 +420,4 @@ If you encounter any issues or have questions, please:
 - Updated documentation and tests
 
 ### v1.0.0
-- Initial release with character cleaning, HTTP/HTTPS deduplication, and trailing slash removal 
+- Initial release with character cleaning, HTTP/HTTPS deduplication, and trailing slash removal
